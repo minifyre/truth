@@ -1,6 +1,6 @@
 export default function truth(...ops)
 {
-	const
+	let
 	i=ops.findIndex(x=>!(x instanceof Function)),
 	[pre,state,post]=truth.zipList(ops,i),
 	send=(act)=>
@@ -8,9 +8,11 @@ export default function truth(...ops)
 		const {ignore,path,type,val}=pre.reduce((act,op)=>op(act)||act,act)
 		if (ignore) return
 		const 
-		[props,prop]=truth.zipList(path,-1),
+		[props,prop]=truth.zipList(path,path.length-1),
 		ref=truth.ref(state,props)
-		type==='set'?ref[prop]=val:delete ref[prop]
+		type==='del'?delete ref[prop]:
+		type==='set'&&path.length?ref[prop]=val:
+		state=val
 		Promise.all(post.map(op=>op(state)))
 		return true
 	}
@@ -28,4 +30,4 @@ truth.proxy=(send,obj={},path=[])=>
 	}):obj
 }
 truth.ref=(ref,path)=>path.reduce((ref,prop)=>ref[prop],ref)
-truth.zipList=(x,at,i=at<0?x.length-at:at)=>[x.slice(0,i),x[i],x.slice(i+1)]
+truth.zipList=(x,i)=>[x.slice(0,i),x[i],x.slice(i+1)]

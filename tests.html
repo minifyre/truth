@@ -1,0 +1,30 @@
+<!Doctype html>
+<script type=module>
+    'use strict'
+    import truth from './truth.mjs'
+    const
+    read={counter:0,oldProp:'val'},
+    equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b),
+    recordHistory=(history=[])=>({history,listener:x=>(history.push(x),x)}),
+    {history,listener:recorder}=recordHistory(),
+    write=truth(recorder,read),
+    expected=
+    {
+        counter:1,
+        newProp:'val',
+        newCounter:0,
+        public:
+        {
+            tabs:['start','end'],
+            files:[]
+        }
+    }
+    write.counter+=1
+    write.newProp='val'
+    write.newCounter=0
+    write.public={tabs:[],files:[]}
+    delete write.oldProp
+    write.public.tabs.push('start','middle','end')
+    write.public.tabs.splice(1,1)
+    equal(read,expected)?console.log('tests passed'):console.error('tests failed')
+</script>
