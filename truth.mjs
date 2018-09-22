@@ -20,7 +20,7 @@ export default function truth(...ops)
 	send({type:'set',path:[],val:state})
 	return truth.proxy(send,state)
 }
-truth.proxy=(send,obj={},path=[])=>
+truth.proxy=(send,obj,path=[])=>
 {
 	return typeof obj==='object'&&obj!==null?
 	new Proxy(obj,
