@@ -6,7 +6,7 @@ export default function truth(...ops)
 	send=function(act)
 	{
 		act=truth.inject(state,truth.compose(pre,act))
-		return act?new Promise(res=>res(truth.compose(post,act))):0
+		return act?new Promise(res=>res(truth.compose(post,act))):act
 	}//promise prevents holding up subsequent code
 	send({type:'set',path:[],val:state})
 	return truth.proxy(send,state)
