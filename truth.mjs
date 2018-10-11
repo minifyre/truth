@@ -4,23 +4,26 @@ export default function truth(...ops)
 	i=ops.findIndex(x=>!(x instanceof Function)),
 	[pre,state,post]=truth.zipList(ops,i),
 	mk=(act,op)=>op(act),
-	send=act=>
+	send=function(act)
 	{
 		act=pre.reduce(mk,act)
-		if (!act.type) return
-		const 
-		{path,type,val}=act,
-		[props,prop]=truth.zipList(path,path.length-1),
-		ref=truth.ref(state,props)
-		type==='del'?delete ref[prop]:
-		type==='set'&&path.length?ref[prop]=val:
-		state=val
+		truth.inject(state,act)
 		return new Promise(pass=>pass(post.reduce(mk,act)))
-	}
+	}//promise prevents holding up subsequent code
 	send({type:'set',path:[],val:state})
 	return truth.proxy(send,state)
 }
-truth.proxy=(send,obj,path=[])=>
+truth.inject=function(state,{path,type,val})
+{
+	if(!type) return
+	const
+	[props,prop]=truth.zipList(path,path.length-1),
+	ref=truth.ref(state,props)
+	type==='del'?delete ref[prop]:
+	type==='set'&&path.length?ref[prop]=val:
+	state=val
+}
+truth.proxy=function(send,obj,path=[])
 {
 	return typeof obj==='object'&&obj!==null?
 	new Proxy(obj,
