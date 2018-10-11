@@ -6,21 +6,23 @@ export default function truth(...ops)
 	send=function(act)
 	{
 		act=truth.inject(state,truth.compose(pre,act))
-		return new Promise(res=>res(truth.compose(post,act)))
+		return act?new Promise(res=>res(truth.compose(post,act))):0
 	}//promise prevents holding up subsequent code
 	send({type:'set',path:[],val:state})
 	return truth.proxy(send,state)
 }
-truth.inject=function(state,{path,type,val})
 truth.compose=(fns,...args)=>fns.reduce((arg,fn)=>fn(...arg),args)
+truth.inject=function(state,act)
 {
-	if(!type) return
+	if(!act.type) return
 	const
+	{path,type,val}=act,
 	[props,prop]=truth.zipList(path,path.length-1),
 	ref=truth.ref(state,props)
 	type==='del'?delete ref[prop]:
 	type==='set'&&path.length?ref[prop]=val:
 	state=val
+	return act
 }
 truth.proxy=function(send,obj,path=[])
 {
