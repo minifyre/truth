@@ -37,6 +37,6 @@ truth.y=function(...ops)
 		return act?new Promise(res=>res(truth.compose(post,act))):act
 	}
 	send({type:'set',path:[],val:state})
-	return {state:truth.proxy(send,state)}
+	return {pre,state:truth.proxy(send,state),post,update:send}
 }
 truth.zipList=(x,i)=>[x.slice(0,i),x[i],x.slice(i+1)]
