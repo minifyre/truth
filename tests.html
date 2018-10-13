@@ -6,7 +6,7 @@
 	equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b),
 	recordHistory=(history=[])=>({history,listener:x=>(history.push(x),x)}),
 	{history,listener:recorder}=recordHistory(),
-	write=truth(recorder,read),
+	write=truth(recorder,read).state,
 	expected=
 	{
 		counter:1,
@@ -27,4 +27,8 @@
 	write.public.tabs.push('start','middle','end')
 	write.public.tabs.splice(1,1)
 	equal(read,expected)?console.log('tests passed'):console.error('tests failed')
+
+	// const tmp=truth.y({value:1},console.log)
+	// tmp.update({from:'server',type:'set',path:['value'],val:2})
+	// console.log(tmp.state)
 </script>

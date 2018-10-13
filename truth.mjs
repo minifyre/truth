@@ -1,6 +1,15 @@
 export default function truth(...ops)
 {
-	return truth.y(...ops).state
+	let
+	i=ops.findIndex(x=>!(x instanceof Function)),
+	[pre,state,post]=truth.zipList(ops,i),
+	send=function(act)//promise return prevents holding up subsequent code
+	{
+		act=truth.compose([...pre,act=>truth.inject(state,act)],act)
+		return act?new Promise(res=>res(truth.compose(post,act))):act
+	}
+	send({type:'set',path:[],val:state})
+	return {pre,state:truth.proxy(send,state),post,update:send}
 }
 truth.compose=(fns,arg)=>fns.reduce((arg,fn)=>fn(arg),arg)
 truth.inject=function(state,act)
@@ -26,17 +35,4 @@ truth.proxy=function(send,obj,path=[])
 	}):obj
 }
 truth.ref=(ref,path)=>path.reduce((ref,prop)=>ref[prop],ref)
-truth.y=function(...ops)
-{
-	let
-	i=ops.findIndex(x=>!(x instanceof Function)),
-	[pre,state,post]=truth.zipList(ops,i),
-	send=function(act)//promise return prevents holding up subsequent code
-	{
-		act=truth.compose([...pre,act=>truth.inject(state,act)],act)
-		return act?new Promise(res=>res(truth.compose(post,act))):act
-	}
-	send({type:'set',path:[],val:state})
-	return {pre,state:truth.proxy(send,state),post,update:send}
-}
 truth.zipList=(x,i)=>[x.slice(0,i),x[i],x.slice(i+1)]
