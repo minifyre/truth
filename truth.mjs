@@ -1,6 +1,6 @@
 export default function truth(...ops)
 {
-	return truth.y(...ops)
+	return truth.y(...ops).state
 }
 truth.compose=(fns,arg)=>fns.reduce((arg,fn)=>fn(arg),arg)
 truth.inject=function(state,act)
@@ -39,5 +39,6 @@ truth.y=function(...ops)
 	pre.push(act=>truth.inject(state,act))
 	send({type:'set',path:[],val:state})
 	return truth.proxy(send,state)
+	return {state:truth.proxy(send,state)}
 }
 truth.zipList=(x,i)=>[x.slice(0,i),x[i],x.slice(i+1)]
