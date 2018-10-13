@@ -5,4 +5,4 @@ This library can be used to create nested proxies when sub-properties are access
 
 Example:
 
-`const state=truth(validate,{initalValue},sendChangeToServer)`
+`const {state}=truth(validate,{initalValue},sendChangeToServer)`
