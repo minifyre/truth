@@ -33,12 +33,10 @@ truth.y=function(...ops)
 	[pre,state,post]=truth.zipList(ops,i),
 	send=function(act)//promise return prevents holding up subsequent code
 	{
-		act=truth.compose(pre,act)
+		act=truth.compose([...pre,act=>truth.inject(state,act)],act)
 		return act?new Promise(res=>res(truth.compose(post,act))):act
 	}
-	pre.push(act=>truth.inject(state,act))
 	send({type:'set',path:[],val:state})
-	return truth.proxy(send,state)
 	return {state:truth.proxy(send,state)}
 }
 truth.zipList=(x,i)=>[x.slice(0,i),x[i],x.slice(i+1)]
