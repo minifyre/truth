@@ -8,7 +8,7 @@ export default function truth(...ops)
 		act=truth.compose([...pre,act=>truth.inject(state,act)],act)
 		return act?new Promise(res=>res(truth.compose(post,act))):act
 	}
-	send({type:'set',path:[],val:state})
+	send({type:'set',path:[],value:state})
 	return {pre,state:truth.proxy(send,state),post,update:send}
 }
 truth.compose=(fns,arg)=>fns.reduce((arg,fn)=>fn(arg),arg)
@@ -16,12 +16,12 @@ truth.inject=function(state,act)
 {
 	if(!act.type) return
 	const
-	{path,type,val}=act,
+	{path,type,value}=act,
 	[props,prop]=truth.zipList(path,path.length-1),
 	ref=truth.ref(state,props)
 	type==='del'?delete ref[prop]:
-	type==='set'&&path.length?ref[prop]=val:
-	state=val
+	type==='set'&&path.length?ref[prop]=value:
+	state=value
 	return act
 }
 truth.proxy=function(send,obj,path=[])
@@ -31,7 +31,7 @@ truth.proxy=function(send,obj,path=[])
 	{
 		deleteProperty:(obj,prop)=>send({type:'del',path:[...path,prop]}),
 		get:(obj,prop)=>truth.proxy(send,obj[prop],[...path,prop]),
-		set:(obj,prop,val)=>send({type:'set',path:[...path,prop],val})
+		set:(obj,prop,value)=>send({type:'set',path:[...path,prop],value})
 	}):obj
 }
 truth.ref=(ref,path)=>path.reduce((ref,prop)=>ref[prop],ref)
