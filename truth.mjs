@@ -21,8 +21,13 @@ truth.inject=function(state,act)
 	ref=truth.ref(state,props)
 	type==='del'?delete ref[prop]:
 	type==='set'&&path.length?ref[prop]=value:
-	state=value
+	truth.reset(state,value)
 	return act
+}
+truth.reset=function(state,value)
+{
+	Object.keys(state).forEach(key=>delete state[key])
+	return Object.assign(state,value)
 }
 truth.proxy=function(send,obj,path=[])
 {
