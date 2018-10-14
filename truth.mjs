@@ -11,6 +11,7 @@ export default function truth(...ops)
 	send({type:'set',path:[],value:state})
 	return {pre,state:truth.proxy(send,state),post,update:send}
 }
+truth.clear=obj=>Object.keys(obj).reduce((obj,key)=>delete obj[key],obj)
 truth.compose=(fns,arg)=>fns.reduce((arg,fn)=>fn(arg),arg)
 truth.inject=function(state,act)
 {
@@ -24,11 +25,7 @@ truth.inject=function(state,act)
 	truth.reset(state,value)
 	return act
 }
-truth.reset=function(state,value)
-{
-	Object.keys(state).forEach(key=>delete state[key])
-	return Object.assign(state,value)
-}
+truth.reset=(obj,val)=>Object.assign(truth.clear(obj),val)
 truth.proxy=function(send,obj,path=[])
 {
 	return typeof obj==='object'&&obj!==null?
