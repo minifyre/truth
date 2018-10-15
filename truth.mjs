@@ -3,13 +3,13 @@ export default function truth(...ops)
 	let
 	i=ops.findIndex(x=>!(x instanceof Function)),
 	[pre,state,post]=truth.zipList(ops,i),
-	send=function(act)//promise return prevents holding up subsequent code
+	update=function(act)//promise return prevents holding up subsequent code
 	{
 		act=truth.compose([...pre,act=>truth.inject(state,act)],act)
 		return act?new Promise(res=>res(truth.compose(post,act))):act
 	}
-	send({type:'set',path:[],value:state})
-	return {pre,state:truth.proxy(send,state),post,update:send}
+	update({type:'set',path:[],value:state})
+	return {pre,state:truth.proxy(update,state),post,update}
 }
 truth.compile=fn=>Object.assign(fn,{compile:true})
 truth.compose=(fns,arg)=>fns.reduce((arg,fn)=>fn(arg),arg)
