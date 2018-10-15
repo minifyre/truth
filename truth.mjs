@@ -11,7 +11,6 @@ export default function truth(...ops)
 	send({type:'set',path:[],value:state})
 	return {pre,state:truth.proxy(send,state),post,update:send}
 }
-truth.clear=obj=>Object.keys(obj).reduce((obj,key)=>delete obj[key],obj)
 truth.compose=(fns,arg)=>fns.reduce((arg,fn)=>fn(arg),arg)
 truth.inject=function(state,act)
 {
@@ -22,7 +21,7 @@ truth.inject=function(state,act)
 	ref=truth.ref(state,props)
 	type==='del'?delete ref[prop]:
 	type==='set'&&path.length?ref[prop]=value:
-	Object.assign(truth.clear(state),value)
+	state=value//@todo this will cause a bug if setting inital state.... that has already been set
 	return act
 }
 truth.proxy=function(send,obj,path=[])
