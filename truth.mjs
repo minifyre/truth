@@ -11,6 +11,7 @@ export default function truth(...ops)
 	send({type:'set',path:[],value:state})
 	return {pre,state:truth.proxy(send,state),post,update:send}
 }
+truth.compile=fn=>Object.assign(fn,{compile:true})
 truth.compose=(fns,arg)=>fns.reduce((arg,fn)=>fn(arg),arg)
 truth.inject=function(state,act)
 {
