@@ -2,12 +2,15 @@ export default function truth(...ops)
 {
 	let
 	i=ops.findIndex(x=>!(x instanceof Function)),
-	[pre,state,post]=truth.zipList(ops,i),
+	[preOps,state,postOps]=truth.zipList(ops,i),
 	update=function(act)//promise return prevents holding up subsequent code
 	{
 		act=truth.compose([...pre,act=>truth.inject(state,act)],act)
 		return act?new Promise(res=>res(truth.compose(post,act))):act
-	}
+	},
+	pre=preOps.map(fn=>fn.compile?fn({state,update}):fn),
+	post=postOps.map(fn=>fn.compile?fn({state,update}):fn)
+
 	update({type:'set',path:[],value:state})
 	return {pre,state:truth.proxy(update,state),post,update}
 }
