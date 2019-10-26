@@ -11,4 +11,4 @@ mkProxy=function(send,obj,path=[])
 	}):obj
 },
 pointer=(ref,path)=>path.reduce((ref,prop)=>ref[prop],ref),
-ziplist=(x,i)=>[x.slice(0,i),x[i],x.slice(i+1)]
+zipList=(x,i)=>[x.slice(0,i),x[i],x.slice(i+1)]

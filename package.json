@@ -1,0 +1,19 @@
+{
+	"name": "truth",
+	"module": "index.js",
+	"description": "A centralized, proxy-based state store with pre & post operation support.",
+	"homepage": "https://github.com/minifyre/truth",
+	"license": "MIT",
+	"version": "3.1.0",
+	"devDependencies": {
+		"c8": "^5.0.4",
+		"rollup": "^1.21.4",
+		"rollup-plugin-terser": "^5.1.2"
+	},
+	"scripts": {
+		"build": "npm run build:dev && npm run test",
+		"build:dev": "rollup -c",
+		"test": "c8 --reporter=html --reporter=lcov --reporter=text node -r esm src/index.test.js"
+	},
+	"type":"module"
+}

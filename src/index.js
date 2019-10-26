@@ -1,24 +1,26 @@
-import {compose,mkProxy,pointer,ziplist} from './util.js'
+import {compose,mkProxy,pointer,zipList} from './util.js'
 
 export default function truth(...ops)
 {
-	// todo: on initial run, check if ops return functions, 
-	// and if they do, use them instead?
 	let
 	i=ops.findIndex(x=>!(x instanceof Function)),
-	[preOps,state,postOps]=ziplist(ops,i),
-	update=function(act)//promise return prevents holding up subsequent code
+	[preOps,initialValue,postOps]=zipList(ops,i),
+	setState=act=>
 	{
-		act=compose([...pre,act=>truth.inject(state,act)],act)
+		act=compose([...pre,act=>truth.inject(initialValue,act)],act)
+
+		//promise return prevents holding up subsequent code
 		return act?new Promise(res=>res(compose(post,act))):act
 	},
-	proxy=mkProxy(update,state),
-	pre=preOps.map(fn=>fn.compile?fn(proxy/*{state:proxy,update}*/):fn),
-	post=postOps.map(fn=>fn.compile?fn(proxy/*{state:proxy,update}*/):fn)
+	proxyState=mkProxy(setState,initialValue),
+	rtn=[proxyState,setState],
+	[pre,post]=[preOps,postOps].map(arr=>arr.map(fn=>fn.compile?fn(...rtn):fn))
 
-	update({type:'set',path:[],value:state})
-	return {pre,state:proxy,post,update}
+	setState({type:'set',path:[],value:initialValue})
+
+	return rtn
 }
+//todo: change to action handler (make compile functionality the default)
 truth.compile=fn=>Object.assign(fn,{compile:true})
 truth.inject=function(state,act)
 {
@@ -26,12 +28,12 @@ truth.inject=function(state,act)
 
 	const
 	{path,type,value}=act,
-	[props,prop]=ziplist(path,path.length-1),
+	[props,prop]=zipList(path,path.length-1),
 	ref=pointer(state,props)
 
 	type==='del'?delete ref[prop]:
 	type==='set'&&path.length?ref[prop]=value:
-	state=value//@todo this will cause a bug if setting inital state.... that has already been set
+	state=value//@todo this will cause a bug if setting initial state.... that has already been set
 
 	return act
 }
